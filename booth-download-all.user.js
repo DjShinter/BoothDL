@@ -3,7 +3,7 @@
 // @namespace    https://booth.pm/
 // @version      1.5.0
 // @description  Adds a "Download All" button to BOOTH orders page that downloads all files as a ZIP
-// @author       You
+// @author       DjShinter
 // @match        https://accounts.booth.pm/orders/*
 // @run-at       document-idle
 // @grant        GM_xmlhttpRequest
@@ -328,3 +328,4 @@
     init();
   }
 })();
+
