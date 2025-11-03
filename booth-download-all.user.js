@@ -1,9 +1,10 @@
 // ==UserScript==
 // @name         BOOTH Orders - Download All
 // @namespace    https://booth.pm/
-// @version      1.5.0
+// @version      1.0.0
 // @description  Adds a "Download All" button to BOOTH orders page that downloads all files as a ZIP
 // @author       DjShinter
+// @license      GNU; https://github.com/DjShinter/BoothDL/blob/main/LICENSE
 // @match        https://accounts.booth.pm/orders/*
 // @run-at       document-idle
 // @grant        GM_xmlhttpRequest
@@ -328,4 +329,5 @@
     init();
   }
 })();
+
 
