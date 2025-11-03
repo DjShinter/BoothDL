@@ -4,7 +4,7 @@
 // @version      1.0.0
 // @description  Adds a "Download All" button to BOOTH orders page that downloads all files as a ZIP
 // @author       DjShinter
-// @license      GNU; https://github.com/DjShinter/BoothDL/blob/main/LICENSE
+// @license     GPL-3.0-or-later; https://www.gnu.org/licenses/gpl-3.0.txt
 // @match        https://accounts.booth.pm/orders/*
 // @run-at       document-idle
 // @grant        GM_xmlhttpRequest
@@ -329,5 +329,6 @@
     init();
   }
 })();
+
 
 
