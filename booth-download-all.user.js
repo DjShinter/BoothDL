@@ -5,7 +5,8 @@
 // @description  Adds a "Download All" button to BOOTH orders page that downloads all files as a ZIP
 // @author       DjShinter
 // @copyright    2025, DjShinter (https://shinter.dev)
-// @license      GPL-3.0; https://www.gnu.org/licenses/gpl-3.0.txt
+// @license CC-BY-SA-3.0; http://creativecommons.org/licenses/by-sa/3.0/
+// @license MIT
 // @homepageURL  https://shinter.dev
 // @supportURL   https://github.com/DjShinter/BoothDL/issues
 // @updateURL    https://openuserjs.org/meta/djshinter/booth-download-all.meta.js
