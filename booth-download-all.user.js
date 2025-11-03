@@ -118,6 +118,7 @@
           method: 'GET',
           url: url,
           responseType: 'arraybuffer',
+          anonymous: false,  // Include cookies for authentication
           // Let GM_xmlhttpRequest follow redirects automatically
           onload: function(response) {
             if (response.status >= 200 && response.status < 300) {
@@ -334,4 +335,3 @@
       init();
     }
   })();
-
