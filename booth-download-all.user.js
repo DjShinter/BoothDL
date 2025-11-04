@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BOOTH Orders - Download All
 // @namespace    https://booth.pm/
-// @version      1.1.0
+// @version      1.1.1
 // @description  Adds a "Download All" button to BOOTH orders page that downloads all files as a ZIP
 // @author       DjShinter
 // @copyright    2025, DjShinter (https://shinter.dev)
@@ -134,7 +134,7 @@
 
   async function downloadFile(url) {
     log('Downloading:', url);
-    
+
     return new Promise((resolve, reject) => {
       GM_xmlhttpRequest({
         method: 'GET',
@@ -146,7 +146,7 @@
           if (response.status >= 200 && response.status < 300) {
             const filename = extractFilenameFromHeaders(response.responseHeaders || '', response.finalUrl || url);
             log('Downloaded:', filename, '(' + (response.response.byteLength / 1024 / 1024).toFixed(2) + ' MB)');
-            
+
             resolve({
               filename: filename,
               data: response.response
@@ -167,7 +167,7 @@
   async function downloadFilesWithRateLimit(anchors, statusDiv) {
     const settings = getSettings();
     const files = [];
-    
+
     if (!settings.rateLimitEnabled) {
       // No rate limiting - download all in parallel
       log('Rate limiting disabled, downloading all files in parallel');
@@ -186,16 +186,16 @@
       });
       return (await Promise.all(downloadPromises)).filter(f => f !== null);
     }
-    
+
     // Rate limiting enabled - download in batches
     log('Rate limiting enabled: ' + settings.maxParallel + ' parallel, ' + settings.delayMs + 'ms delay');
     const batchSize = settings.maxParallel;
     let completed = 0;
-    
+
     for (let i = 0; i < anchors.length; i += batchSize) {
       const batch = anchors.slice(i, i + batchSize);
       log('Downloading batch ' + (Math.floor(i / batchSize) + 1) + ' (' + batch.length + ' files)');
-      
+
       const batchPromises = batch.map(async (anchor) => {
         try {
           const file = await downloadFile(anchor.href);
@@ -208,26 +208,26 @@
           return null;
         }
       });
-      
+
       const batchResults = await Promise.all(batchPromises);
       files.push(...batchResults.filter(f => f !== null));
-      
+
       // Add delay between batches (except for the last batch)
       if (i + batchSize < anchors.length) {
         log('Waiting ' + settings.delayMs + 'ms before next batch...');
         await new Promise(resolve => setTimeout(resolve, settings.delayMs));
       }
     }
-    
+
     return files;
   }
 
   // Create settings modal
   function createSettingsModal() {
     if (document.getElementById(SETTINGS_MODAL_ID)) return;
-    
+
     const settings = getSettings();
-    
+
     const modal = document.createElement('div');
     modal.id = SETTINGS_MODAL_ID;
     modal.style.cssText = `
@@ -242,7 +242,7 @@
       justify-content: center;
       z-index: 10000;
     `;
-    
+
     const panel = document.createElement('div');
     panel.style.cssText = `
       background: white;
@@ -252,7 +252,7 @@
       max-width: 400px;
       width: 90%;
     `;
-    
+
     panel.innerHTML = `
       <style>
         .toggle-switch {
@@ -295,9 +295,9 @@
           transform: translateX(24px);
         }
       </style>
-      
+
       <h3 style="margin: 0 0 16px 0; font-size: 18px; color: #333;">Download Settings</h3>
-      
+
       <div style="margin-bottom: 16px;">
         <label style="display: flex; align-items: center; cursor: pointer; justify-content: space-between;">
           <div>
@@ -312,7 +312,7 @@
           </label>
         </label>
       </div>
-      
+
       <div style="margin-bottom: 16px;">
         <label style="display: block; font-size: 14px; color: #333; margin-bottom: 4px;">
           Max Parallel Downloads
@@ -323,7 +323,7 @@
           Number of files to download simultaneously (1-20)
         </p>
       </div>
-      
+
       <div style="margin-bottom: 20px;">
         <label style="display: block; font-size: 14px; color: #333; margin-bottom: 4px;">
           Delay Between Batches (ms)
@@ -334,42 +334,42 @@
           Wait time between batches in milliseconds (0-99999)
         </p>
       </div>
-      
+
       <div style="display: flex; gap: 8px; justify-content: flex-end;">
-        <button id="cancelSettings" style="padding: 8px 16px; border: 1px solid #ddd; background: white; 
+        <button id="cancelSettings" style="padding: 8px 16px; border: 1px solid #ddd; background: white;
                 border-radius: 4px; cursor: pointer; font-size: 14px; color: #333;">
           Cancel
         </button>
-        <button id="saveSettings" style="padding: 8px 16px; border: none; background: #fc5185; 
+        <button id="saveSettings" style="padding: 8px 16px; border: none; background: #fc5185;
                 color: white; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 500;">
           Save
         </button>
       </div>
     `;
-    
+
     modal.appendChild(panel);
     document.body.appendChild(modal);
-    
+
     // Event listeners
     document.getElementById('cancelSettings').addEventListener('click', () => {
       modal.remove();
     });
-    
+
     document.getElementById('saveSettings').addEventListener('click', () => {
       const newSettings = {
         rateLimitEnabled: document.getElementById('rateLimitEnabled').checked,
         maxParallel: parseInt(document.getElementById('maxParallel').value) || 5,
         delayMs: parseInt(document.getElementById('delayMs').value) || 3000
       };
-      
+
       // Validate
       newSettings.maxParallel = Math.max(1, Math.min(20, newSettings.maxParallel));
       newSettings.delayMs = Math.max(0, Math.min(99999, newSettings.delayMs));
-      
+
       saveSettings(newSettings);
       modal.remove();
     });
-    
+
     // Close on background click
     modal.addEventListener('click', (e) => {
       if (e.target === modal) {
@@ -397,16 +397,16 @@
     // Create a Booth-styled list item matching the exact structure
     const listItem = document.createElement('div');
     listItem.className = 'legacy-list-item';
-    
+
     const center = document.createElement('div');
     center.className = 'legacy-list-item__center u-tpg-caption1';
     center.style.cssText = 'flex: 1;';
-    
+
     // Left side - status only
     const leftDiv = document.createElement('div');
     leftDiv.className = 'min-w-0 u-text-wrap';
     leftDiv.style.cssText = 'color: #505c6b; flex: 1;';
-    
+
     const statusDiv = document.createElement('div');
     statusDiv.id = STATUS_ID;
     statusDiv.style.fontSize = '12px';
@@ -414,18 +414,18 @@
     statusDiv.style.display = 'none';
     statusDiv.style.whiteSpace = 'pre-line';
     leftDiv.appendChild(statusDiv);
-    
+
     // Right side - button wrapper matching Booth structure
     const rightWrap = document.createElement('div');
     rightWrap.className = 'flex items-center';
     rightWrap.style.cssText = 'margin-top: 8px; flex: none;';
-    
+
     const spacer = document.createElement('div');
-    
+
     const actionDiv = document.createElement('div');
     actionDiv.className = 'u-ml-500 u-mr-sp-500';
     actionDiv.style.cssText = 'display: flex; gap: 8px;';
-    
+
     // Create settings button
     const settingsBtn = document.createElement('a');
     settingsBtn.id = SETTINGS_BTN_ID;
@@ -433,34 +433,34 @@
     settingsBtn.className = 'nav-reverse';
     settingsBtn.title = 'Download Settings';
     settingsBtn.style.cssText = 'font-size: 18px; display: flex; align-items: center;';
-    
+
     const settingsIcon = document.createElement('span');
     settingsIcon.textContent = '⚙';
     settingsIcon.style.cssText = 'display: inline-block;';
     settingsBtn.appendChild(settingsIcon);
-    
+
     // Create the anchor button matching Booth's exact style
     const btn = document.createElement('a');
     btn.id = BUTTON_ID;
     btn.href = 'javascript:void(0)';
     btn.className = 'nav-reverse';
-    
+
     const icon = document.createElement('i');
     icon.className = 'icon-download s-1x';
-    
+
     const label = document.createElement('span');
     label.className = 'cmd-label';
     label.textContent = 'Download All';
-    
+
     btn.appendChild(icon);
     btn.appendChild(label);
-    
+
     actionDiv.appendChild(btn);
     actionDiv.appendChild(settingsBtn);
-    
+
     rightWrap.appendChild(spacer);
     rightWrap.appendChild(actionDiv);
-    
+
     center.appendChild(leftDiv);
     center.appendChild(rightWrap);
     listItem.appendChild(center);
@@ -501,23 +501,23 @@
 
         statusDiv.textContent = 'Creating ZIP with ' + files.length + ' files...';
         log('Using fflate to create ZIP...');
-        
+
         // Use fflate (modern, fast ZIP library)
         const zipData = {};
         files.forEach(file => {
           // fflate expects Uint8Array
           zipData[file.filename] = new Uint8Array(file.data);
         });
-        
+
         statusDiv.textContent = 'Compressing ZIP (no compression for speed)...';
-        
+
         // Create ZIP with fflate (synchronous, but fast)
         const zipped = fflate.zipSync(zipData, {
           level: 0  // No compression (files are already .zip files)
         });
-        
+
         log('ZIP created! Size:', zipped.byteLength);
-        
+
         // Download the ZIP
         const zipFilename = productName + '.zip';
         const zipBlob = new Blob([zipped], { type: 'application/zip' });
@@ -529,7 +529,7 @@
         link.click();
         document.body.removeChild(link);
         setTimeout(() => URL.revokeObjectURL(zipUrl), 1000);
-        
+
         statusDiv.textContent = '✓ Downloaded ' + zipFilename + ' (' + files.length + ' files)';
       } catch (error) {
         console.error('[BOOTH Download All] Error', error);
@@ -562,16 +562,6 @@
       subtree: true,
     });
 
-    // Retry until button appears
-    let tries = 0;
-    const timer = setInterval(() => {
-      if (document.getElementById(BUTTON_ID) || tries >= 20) {
-        clearInterval(timer);
-      } else {
-        createButton();
-        tries++;
-      }
-    }, 500);
   }
 
   if (document.readyState === 'loading') {
